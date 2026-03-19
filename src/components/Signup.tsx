@@ -6,7 +6,7 @@ const Signup = ({ setUser }: UserProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const onSignUp = async () => {
+  const handleSignUp = async () => {
     const { data } = await supabase.auth.signUp({
       email,
       password,
@@ -27,7 +27,7 @@ const Signup = ({ setUser }: UserProps) => {
           value={password}
           onChange={({ target }) => setPassword(target.value)}
         />
-        <button onClick={onSignUp}>Sign up</button>
+        <button onClick={handleSignUp}>Sign up</button>
       </div>
     </div>
   );

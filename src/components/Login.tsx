@@ -11,7 +11,7 @@ const Login = ({ user, setUser }: UserProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const onLogin = async () => {
+  const handleLogin = async () => {
     await supabase.auth.signInWithPassword({ email, password });
     const { data } = await supabase.auth.getSession();
     setUser(data.session?.user ?? null);
@@ -19,7 +19,7 @@ const Login = ({ user, setUser }: UserProps) => {
     setPassword("");
   };
 
-  const onSignOut = async () => {
+  const handleSignout = async () => {
     await supabase.auth.signOut();
     setUser(null);
   };
@@ -38,10 +38,10 @@ const Login = ({ user, setUser }: UserProps) => {
             value={password}
             onChange={({ target }) => setPassword(target.value)}
           />
-          <button onClick={onLogin}>Sign in</button>
+          <button onClick={handleLogin}>Sign in</button>
         </div>
       )}
-      {user && <button onClick={onSignOut}>Sign out</button>}
+      {user && <button onClick={handleSignout}>Sign out</button>}
     </div>
   );
 };
