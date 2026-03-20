@@ -18,7 +18,7 @@ function App() {
       }
       setUser(data.session?.user ?? null);
       // console.log(data.session?.user);
-    };
+    }; 
 
     loadSession();
   }, []);
@@ -27,6 +27,7 @@ function App() {
     <>
       <NavLink to="/">Home</NavLink>
       <NavLink to="/signup">Signup</NavLink>
+      {}
       <h2>Hello, World</h2>
       <Login user={user} setUser={setUser} />
       <Routes>
