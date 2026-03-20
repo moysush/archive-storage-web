@@ -16,6 +16,7 @@ import {
   createTheme,
   ThemeProvider,
   Switch,
+  Link,
 } from "@mui/material";
 
 function App() {
@@ -76,19 +77,19 @@ function App() {
               />
               {!user && (
                 <>
-                  <NavLink
+                  <Button
                     style={{ color: "inherit", textDecoration: "none" }}
-                    to="/login"
+                    onClick={() => navigate("/login")}
                   >
                     login
-                  </NavLink>
+                  </Button>
 
-                  <NavLink
+                  <Button
                     style={{ color: "inherit", textDecoration: "none" }}
-                    to="/signup"
+                    onClick={() => navigate("/signup")}
                   >
-                    Sign up
-                  </NavLink>
+                    sign up
+                  </Button>
                 </>
               )}
               {user && (
