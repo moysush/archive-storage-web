@@ -1,18 +1,23 @@
-import { useState } from "react";
 import { supabase } from "../utils/supabase";
 import type { UserProps } from "./Login";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import DocumentItem from "./DocumentItem";
 import UploadForm from "./UploadForm";
+import {
+  Paper,
+  Typography,
+  Box,
+  CircularProgress,
+} from "@mui/material";
+import { useState } from "react";
 
 const Documents = ({ user }: UserProps) => {
   const queryClient = useQueryClient();
-  const [newFile, setNewFile] = useState<File | null>(null);
+  const [onLoadingAnimation, setOnLoadingAnimation] = useState(false);
   const userId = user?.id || "";
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setNewFile(e.target.files[0]);
-    }
+  const sanitizeFileName = (name: string) => {
+    // eslint-disable-next-line no-useless-escape
+    return name.replace(/[/\[\]{}()*?'"<>|\\/:]/g, "_");
   };
 
   const {
@@ -46,31 +51,40 @@ const Documents = ({ user }: UserProps) => {
 
   const deleteMutation = useMutation({
     mutationFn: async (fileName: string) => {
+      setOnLoadingAnimation(true);
       return await supabase.storage
         .from("documents")
         .remove([`${user?.id}/${fileName}`]);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["files", userId] });
+      setOnLoadingAnimation(false);
       alert("deleted successfully");
+    },
+    onError: () => {
+      setOnLoadingAnimation(false);
     },
   });
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
       const path = `${user?.id}/${file?.name}`;
+      setOnLoadingAnimation(true);
       const { data, error } = await supabase.storage
         .from("documents")
         .upload(path, file);
       if (error) throw error;
-      setNewFile(null);
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["files", userId] });
       alert("uploaded!");
+      setOnLoadingAnimation(false);
     },
-    onError: () => {},
+    onError: () => {
+      setOnLoadingAnimation(false);
+    },
   });
 
   const handleDownload = async (fileName: string, folderName: string) => {
@@ -90,14 +104,27 @@ const Documents = ({ user }: UserProps) => {
     URL.revokeObjectURL(url);
   };
 
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return null;
+    const file = e.target.files[0];
+    if (file) {
+    const safeName = sanitizeFileName(file.name);
+    const safeFile = new File([file], safeName, {type: file.type})  
+    uploadMutation.mutate(safeFile);
+    }
+  };
+
   if (isLoading) return <p>Loading files...</p>;
   if (error) return <p>Error loading files</p>;
 
   return (
-    <div>
-      <h2>documents</h2>
-      <p>total files: {files?.length}</p>
-      {!files && <p>no documents yet</p>}
+    <Paper elevation={0}>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Typography variant="h6">Total Files: {files?.length}</Typography>
+        {!files && <Typography>No documents yet...</Typography>}
+        {onLoadingAnimation && <CircularProgress />}
+        <UploadForm onFileChange={handleUpload} />
+      </Box>
       {files?.map((f) => (
         <DocumentItem
           key={f.id}
@@ -107,12 +134,7 @@ const Documents = ({ user }: UserProps) => {
           onDelete={deleteMutation.mutate}
         />
       ))}
-      <UploadForm
-        onFileChange={handleUpload}
-        onUpload={() => uploadMutation.mutate(newFile as File)}
-        disabled={!newFile}
-      />
-    </div>
+    </Paper>
   );
 };
 

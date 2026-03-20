@@ -1,3 +1,12 @@
+import {
+  Button,
+  Card,
+  CardContent,
+  CardActions,
+  Typography,
+} from "@mui/material";
+import { Download } from "@mui/icons-material";
+import { Delete } from "@mui/icons-material";
 
 type DocumentItemProps = {
   file: {
@@ -24,18 +33,42 @@ const DocumentItem = ({
   onDelete,
 }: DocumentItemProps) => {
   return (
-    <div key={file.id}>
-      <p>{file.name}</p>
-      <p>
-        {file.created_at ? new Date(file.created_at).toLocaleString() : null}
-      </p>
-      <button onClick={() => onDownload(file.name, file.folderName)}>
-        download
-      </button>
-      {file.folderName === userId && (
-        <button onClick={() => onDelete(file.name)}>delete</button>
-      )}
-    </div>
+    <Card
+      key={file.id}
+      variant="outlined"
+      sx={{ my: 2, p: 1, borderRadius: 2 }}
+    >
+      <CardContent>
+        <Typography variant="subtitle1" fontWeight="bold" fontSize="large">
+          {file.name}
+        </Typography>
+        <Typography variant="body1">
+          Uploaded on{" "}
+          {file.created_at ? new Date(file.created_at).toLocaleString() : null}
+        </Typography>
+      </CardContent>
+      <CardActions>
+        <Button
+          variant="text"
+          size="small"
+          startIcon={<Download />}
+          onClick={() => onDownload(file.name, file.folderName)}
+        >
+          download
+        </Button>
+        {file.folderName === userId && (
+          <Button
+            variant="text"
+            size="small"
+            color="error"
+            startIcon={<Delete />}
+            onClick={() => onDelete(file.name)}
+          >
+            delete
+          </Button>
+        )}
+      </CardActions>
+    </Card>
   );
 };
 
