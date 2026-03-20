@@ -2,10 +2,13 @@ import { useState } from "react";
 import { supabase } from "../utils/supabase";
 import type { UserProps } from "./Login";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import DocumentItem from "./DocumentItem";
+import UploadForm from "./UploadForm";
 
 const Documents = ({ user }: UserProps) => {
   const queryClient = useQueryClient();
   const [newFile, setNewFile] = useState<File | null>(null);
+  const userId = user?.id || "";
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setNewFile(e.target.files[0]);
@@ -17,7 +20,7 @@ const Documents = ({ user }: UserProps) => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["files", user?.id],
+    queryKey: ["files", userId],
     queryFn: async () => {
       const { data: folders } = await supabase.storage
         .from("documents")
@@ -48,7 +51,7 @@ const Documents = ({ user }: UserProps) => {
         .remove([`${user?.id}/${fileName}`]);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["files", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["files", userId] });
       alert("deleted successfully");
     },
   });
@@ -64,7 +67,7 @@ const Documents = ({ user }: UserProps) => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["files", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["files", userId] });
       alert("uploaded!");
     },
     onError: () => {},
@@ -96,23 +99,19 @@ const Documents = ({ user }: UserProps) => {
       <p>total files: {files?.length}</p>
       {!files && <p>no documents yet</p>}
       {files?.map((f) => (
-        <div key={f.id}>
-          <p>{f.name}</p>
-          <p>Posted on {f.created_at? new Date(f.created_at).toLocaleString(): null}</p>
-          <button onClick={() => handleDownload(f.name, f.folderName)}>
-            download
-          </button>
-          {f.folderName === user?.id && (
-            <button onClick={() => deleteMutation.mutate(f.name)}>
-              delete
-            </button>
-          )}
-        </div>
+        <DocumentItem
+          key={f.id}
+          file={f}
+          userId={userId}
+          onDownload={handleDownload}
+          onDelete={deleteMutation.mutate}
+        />
       ))}
-      <input type="file" onChange={handleUpload} />
-      <button onClick={() => uploadMutation.mutate(newFile as File)}>
-        upload
-      </button>
+      <UploadForm
+        onFileChange={handleUpload}
+        onUpload={() => uploadMutation.mutate(newFile as File)}
+        disabled={!newFile}
+      />
     </div>
   );
 };
