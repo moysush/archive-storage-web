@@ -49,7 +49,7 @@ const DocumentItem = ({
       </CardContent>
       <CardActions>
         <Button
-          variant="text"
+          variant="contained"
           size="small"
           startIcon={<Download />}
           onClick={() => onDownload(file.name, file.folderName)}
@@ -58,7 +58,7 @@ const DocumentItem = ({
         </Button>
         {file.folderName === userId && (
           <Button
-            variant="text"
+            variant="contained"
             size="small"
             color="error"
             startIcon={<Delete />}

@@ -16,7 +16,6 @@ import {
   createTheme,
   ThemeProvider,
   Switch,
-  Link,
 } from "@mui/material";
 
 function App() {
@@ -26,6 +25,11 @@ function App() {
   const theme = createTheme({
     palette: {
       mode,
+      primary: {
+        main: "#C1E1C1",
+        // light: "#77DD77",
+        // dark: "#C1E1C1",
+      },
     },
   });
 
