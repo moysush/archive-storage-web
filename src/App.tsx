@@ -19,11 +19,15 @@ import {
   Alert,
 } from "@mui/material";
 
+type modeType = "light" | "dark";
+
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"light" | "dark">("light");
+  const [mode, setMode] = useState<modeType>(
+    (localStorage.getItem("themeMode") as modeType) || "light",
+  );
   const theme = createTheme({
     palette: {
       mode,
@@ -55,6 +59,10 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, [message]);
+
+  useEffect(() => {
+    localStorage.setItem("themeMode", mode);
+  }, [mode]);
 
   const handleSignout = async () => {
     await supabase.auth.signOut();
@@ -114,7 +122,7 @@ function App() {
           </AppBar>
           {message && (
             <Alert
-              sx={{ mb: 2 }}
+              sx={{ mb: 2, borderRadius: 2 }}
               severity={message.includes("success") ? "success" : "error"}
               action={
                 message.includes("sure") && (
