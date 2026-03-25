@@ -7,6 +7,12 @@ import {
 } from "@mui/material";
 import { Download } from "@mui/icons-material";
 import { Delete } from "@mui/icons-material";
+import { FileIcon, defaultStyles } from "react-file-icon";
+
+const getExtension = (filename: string) => {
+  const parts = filename.split(".");
+  return parts.length > 1 ? parts.pop()!.toLowerCase() : "";
+};
 
 type DocumentItemProps = {
   file: {
@@ -32,20 +38,32 @@ const DocumentItem = ({
   onDownload,
   onDelete,
 }: DocumentItemProps) => {
+  const ext = getExtension(file.name);
+
   return (
     <Card
       key={file.id}
       variant="outlined"
       sx={{ my: 2, p: 1, borderRadius: 2 }}
     >
-      <CardContent>
-        <Typography variant="subtitle1" fontWeight="bold" fontSize="large">
-          {file.name}
-        </Typography>
-        <Typography variant="body1">
-          Uploaded on{" "}
-          {file.created_at ? new Date(file.created_at).toLocaleString() : null}
-        </Typography>
+      <CardContent sx={{display: "flex", gap: 2, alignItems: "center"}}>
+        <div style={{ width: 24, height: 24 }}>
+          <FileIcon
+            extension={ext}
+            {...defaultStyles[ext]}
+          />
+        </div>
+        <div>
+          <Typography variant="subtitle1" fontWeight="bold" fontSize="large">
+            {file.name}
+          </Typography>
+          <Typography variant="body1">
+            Uploaded on{" "}
+            {file.created_at
+              ? new Date(file.created_at).toLocaleString()
+              : null}
+          </Typography>
+        </div>
       </CardContent>
       <CardActions>
         <Button
