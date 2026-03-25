@@ -50,7 +50,7 @@ const DocumentItem = ({
         <div style={{ width: 24, height: 24 }}>
           <FileIcon
             extension={ext}
-            {...defaultStyles[ext]}
+            {...defaultStyles[ext as keyof typeof defaultStyles] }
           />
         </div>
         <div>

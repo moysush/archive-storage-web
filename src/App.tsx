@@ -124,13 +124,6 @@ function App() {
             <Alert
               sx={{ mb: 2, borderRadius: 2 }}
               severity={message.includes("success") ? "success" : "error"}
-              action={
-                message.includes("sure") && (
-                  <Button color="inherit" size="small">
-                    UNDO
-                  </Button>
-                )
-              }
             >
               {message}
             </Alert>

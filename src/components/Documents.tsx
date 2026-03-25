@@ -111,6 +111,12 @@ const Documents = ({ user, setMessage }: UserProps) => {
     }
   };
 
+  const sortedFiles = [...(files ?? [])].sort((a, b) => {
+    const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+    const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+    return dateB - dateA;
+  });
+
   if (isLoading) return <p>Loading files...</p>;
   if (error) return <p>Error loading files</p>;
 
@@ -122,7 +128,7 @@ const Documents = ({ user, setMessage }: UserProps) => {
         {onLoadingAnimation && <CircularProgress />}
         <UploadForm onFileChange={handleUpload} />
       </Box>
-      {files?.map((f) => (
+      {sortedFiles?.map((f) => (
         <DocumentItem
           key={f.id}
           file={f}
