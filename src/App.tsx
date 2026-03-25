@@ -16,10 +16,12 @@ import {
   createTheme,
   ThemeProvider,
   Switch,
+  Alert,
 } from "@mui/material";
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const [mode, setMode] = useState<"light" | "dark">("light");
   const theme = createTheme({
@@ -46,6 +48,13 @@ function App() {
 
     loadSession();
   }, []);
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   const handleSignout = async () => {
     await supabase.auth.signOut();
@@ -103,18 +112,43 @@ function App() {
               )}
             </Toolbar>
           </AppBar>
+          {message && (
+            <Alert
+              sx={{ mb: 2 }}
+              severity={message.includes("success") ? "success" : "error"}
+              action={
+                message.includes("sure") && (
+                  <Button color="inherit" size="small">
+                    UNDO
+                  </Button>
+                )
+              }
+            >
+              {message}
+            </Alert>
+          )}
           <Routes>
             <Route
               path="/"
-              element={<Documents user={user} setUser={setUser} />}
+              element={
+                <Documents
+                  user={user}
+                  setUser={setUser}
+                  setMessage={setMessage}
+                />
+              }
             />
             <Route
               path="/login"
-              element={<Login user={user} setUser={setUser} />}
+              element={
+                <Login user={user} setUser={setUser} setMessage={setMessage} />
+              }
             />
             <Route
               path="/signup"
-              element={<Signup user={user} setUser={setUser} />}
+              element={
+                <Signup user={user} setUser={setUser} setMessage={setMessage} />
+              }
             />
           </Routes>
         </Container>

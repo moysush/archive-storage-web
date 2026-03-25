@@ -11,19 +11,27 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router";
 
-const Signup = ({ setUser }: UserProps) => {
+const Signup = ({ setUser, setMessage }: UserProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const handleSignUp = async () => {
-    const { data } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    if (data) {
-      setUser(data.session?.user ?? null);
-      navigate("/");
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      console.log(data);
+      if (data.session !== null) {
+        setUser(data.session?.user ?? null);
+        setMessage("Signed up successfully");
+        navigate("/");
+      } else if (error) {
+        setMessage(error?.message);
+      }
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : String(error));
     }
   };
 

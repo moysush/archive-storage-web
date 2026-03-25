@@ -14,21 +14,29 @@ import { useNavigate } from "react-router";
 export type UserProps = {
   user: User | null;
   setUser: (user: User | null) => void;
+  setMessage: (message: string) => void;
 };
 
-const Login = ({ setUser }: UserProps) => {
+const Login = ({ setUser, setMessage }: UserProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    await supabase.auth.signInWithPassword({ email, password });
-    const { data } = await supabase.auth.getSession();
-    if (data) {
-      setUser(data.session?.user ?? null);
-      setEmail("");
-      setPassword("");
-      navigate("/");
+    try {
+      const res = await supabase.auth.signInWithPassword({ email, password });
+      const { data } = await supabase.auth.getSession();
+      if (data.session !== null) {
+        setUser(data.session?.user ?? null);
+        setEmail("");
+        setPassword("");
+        setMessage("Logged in successfully!");
+        navigate("/");
+      } else if (res.error) {
+        setMessage(res.error?.message);
+      }
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : String(error));
     }
   };
 

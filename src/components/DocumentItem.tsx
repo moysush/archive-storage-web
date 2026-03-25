@@ -62,7 +62,13 @@ const DocumentItem = ({
             size="small"
             color="error"
             startIcon={<Delete />}
-            onClick={() => onDelete(file.name)}
+            onClick={() => {
+              if (
+                window.confirm("Are you sure you want to delete this file?")
+              ) {
+                onDelete(file.name);
+              }
+            }}
           >
             delete
           </Button>

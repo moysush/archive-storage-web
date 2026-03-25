@@ -3,15 +3,10 @@ import type { UserProps } from "./Login";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import DocumentItem from "./DocumentItem";
 import UploadForm from "./UploadForm";
-import {
-  Paper,
-  Typography,
-  Box,
-  CircularProgress,
-} from "@mui/material";
+import { Paper, Typography, Box, CircularProgress } from "@mui/material";
 import { useState } from "react";
 
-const Documents = ({ user }: UserProps) => {
+const Documents = ({ user, setMessage }: UserProps) => {
   const queryClient = useQueryClient();
   const [onLoadingAnimation, setOnLoadingAnimation] = useState(false);
   const userId = user?.id || "";
@@ -59,9 +54,10 @@ const Documents = ({ user }: UserProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["files", userId] });
       setOnLoadingAnimation(false);
-      alert("deleted successfully");
+      setMessage("Deleted successfully!");
     },
-    onError: () => {
+    onError: (error) => {
+      setMessage(error instanceof Error ? error.message : String(error));
       setOnLoadingAnimation(false);
     },
   });
@@ -79,10 +75,11 @@ const Documents = ({ user }: UserProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["files", userId] });
-      alert("uploaded!");
       setOnLoadingAnimation(false);
+      setMessage("Uploaded successfully!");
     },
-    onError: () => {
+    onError: (error) => {
+      setMessage(error instanceof Error ? error.message : String(error));
       setOnLoadingAnimation(false);
     },
   });
@@ -108,9 +105,9 @@ const Documents = ({ user }: UserProps) => {
     if (!e.target.files) return null;
     const file = e.target.files[0];
     if (file) {
-    const safeName = sanitizeFileName(file.name);
-    const safeFile = new File([file], safeName, {type: file.type})  
-    uploadMutation.mutate(safeFile);
+      const safeName = sanitizeFileName(file.name);
+      const safeFile = new File([file], safeName, { type: file.type });
+      uploadMutation.mutate(safeFile);
     }
   };
 
